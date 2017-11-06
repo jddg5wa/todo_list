@@ -1,0 +1,10 @@
+J:\Personal\Software\todo_list\bin\Debug\netcoreapp2.0\todo_list.deps.json
+J:\Personal\Software\todo_list\bin\Debug\netcoreapp2.0\todo_list.runtimeconfig.json
+J:\Personal\Software\todo_list\bin\Debug\netcoreapp2.0\todo_list.runtimeconfig.dev.json
+J:\Personal\Software\todo_list\bin\Debug\netcoreapp2.0\todo_list.dll
+J:\Personal\Software\todo_list\bin\Debug\netcoreapp2.0\todo_list.pdb
+J:\Personal\Software\todo_list\obj\Debug\netcoreapp2.0\todo_list.csproj.CoreCompileInputs.cache
+J:\Personal\Software\todo_list\obj\Debug\netcoreapp2.0\todo_list.AssemblyInfoInputs.cache
+J:\Personal\Software\todo_list\obj\Debug\netcoreapp2.0\todo_list.AssemblyInfo.cs
+J:\Personal\Software\todo_list\obj\Debug\netcoreapp2.0\todo_list.dll
+J:\Personal\Software\todo_list\obj\Debug\netcoreapp2.0\todo_list.pdb
