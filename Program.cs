@@ -17,13 +17,18 @@ namespace todo_list
     }
     public class Task
     {
-        public string Title {get; set;}
-        public DateTime startDate {get; set;}
-        public DateTime dueDate {get; set;}
+        public string Description { get; set; }
+        public DateTime startDate;
+        public DateTime dueDate;
 
-        public Task(string Title, DateTime startDate, DateTime dueDate)
+        public void setStartDate(string inputDate, string inputTime)
         {
-            
+            startDate = Convert.ToDateTime(string.Format("{0} {1}:00.00", inputDate, inputTime));
+        }
+
+        public void setDueDate(string inputDate, string inputTime)
+        {
+            dueDate = Convert.ToDateTime(string.Format("{0} {1}:00.00", inputDate, inputTime));
         }
     }
     class Program
@@ -87,7 +92,34 @@ namespace todo_list
 
         static void newTask()
         {
-            Console.WriteLine("\nLet's CREATE a NEW TASK.");   
+            Task userTask = new Task();
+            Console.WriteLine("\nLet's CREATE a NEW TASK.");  
+
+            // Task Description
+            Console.WriteLine("Task Description:");
+            userTask.Description = Console.ReadLine();  
+
+            // Task Start Date
+            Console.WriteLine("\nTask Start Date (MM/DD/YEAR):");
+            string taskStartDate = Console.ReadLine();  
+
+            // Task Start Time
+            Console.WriteLine("\nTask Start Time (HR:MN):");
+            string taskStartTime = Console.ReadLine(); 
+            userTask.setStartDate(taskStartDate, taskStartTime);
+
+            // Task Due Date
+            Console.WriteLine("\nTask Due Date (MM/DD/YEAR):");
+            string taskDueDate = Console.ReadLine();  
+
+            // Task Due Time
+            Console.WriteLine("\nTask Due Time (HR:MN):");
+            string taskDueTime = Console.ReadLine(); 
+            userTask.setStartDate(taskDueDate, taskDueTime);
+
+            // saveTask(userTask);
+            Console.WriteLine("\nThat's all. Your task is now saved.");   
+            printTask(userTask);
         }
 
         static void newTaskList()
@@ -105,8 +137,14 @@ namespace todo_list
             Console.WriteLine("\nWhich LIST would you like to DELETE?");   
         }
 
-        static void saveTask(object task)
+        static void saveTask(Task task)
         {
+        }
+
+        static void printTask(Task task)
+        {
+            Console.WriteLine("\nTask Description: {0} \nStart Date: {1} \nDue Date: {2}", 
+                                task.Description, task.startDate, task.dueDate.ToString()); 
         }
     }
 }
