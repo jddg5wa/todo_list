@@ -2,19 +2,22 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Diagnostics;
+using System.Xml;
 
 
 namespace todo_list
 {
     public class TaskList
     {
-        public List<Task> allTasks { get; set; }
+        public List<Task> tasks { get; set; }
 
         public TaskList()
         {
-            allTasks = new List<Task>();
+            tasks = new List<Task>();
         }
     }
+
     public class Task
     {
         public string Description { get; set; }
@@ -31,73 +34,64 @@ namespace todo_list
             dueDate = Convert.ToDateTime(string.Format("{0} {1}:00.00", inputDate, inputTime));
         }
     }
-    class Program
+
+    public class SaveableData 
+    {
+        public List<Task> allTasks = new List<Task>();
+        public List<TaskList> allTaskLists = new List<TaskList>();
+    }
+
+    
+    public class Program
     {
         static void Main(string[] args)
         {
-            CreateFoldersAndFiles();
-            UserInput("");
+            var options = new List<string> {"new list", "new task", "delete list", "delete task"};
+            Console.WriteLine("What would you like to do? (" + String.Join(", ",options) + ")");
+            UserInputs(Console.ReadLine());
+
+            Task testTask = new Task();
+            testTask.Description = "Test Saving Functionality";
+            testTask.setStartDate("05/20/1993", "12:00");
+            testTask.setDueDate("05/20/1993", "12:00");
+
+            saveData(testTask);
+            printTask(loadData());
         }
 
-        static void CreateFoldersAndFiles()
+        static void UserInputs(string input)
         {
-            string appDataPath = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string dataPath = Path.Combine(appDataPath , "ToDo_List");
-            string tasksFullPath = Path.Combine(dataPath, "tasks.xml");
-
-            if(!File.Exists(tasksFullPath))
+            if(input == "new list")
             {
-                Directory.CreateDirectory(dataPath);
-                File.Create(tasksFullPath);
+                newTaskList();                
+            }
+            else if(input == "new task")
+            {
+                newTask();                
+            }
+            else if(input == "delete list")
+            {
+                deleteTaskList();                
+            }
+            else if(input == "delete task")
+            {
+                deleteTask();                
             }
             else
             {
-                Console.WriteLine("File Exists");
-            }
-        }
-        static void UserInput(string input)
-        {
-            if(input == "")
-            {
-                var options = new List<string> {"new list", "new task", "delete list", "delete task"};
-                Console.WriteLine("What would you like to do? (" + String.Join(", ",options) + ")");
-                UserInput(Console.ReadLine());
-            }
-            else
-            {
-                if(input == "new list")
-                {
-                    newTaskList();                
-                }
-                else if(input == "new task")
-                {
-                    newTask();                
-                }
-                else if(input == "delete list")
-                {
-                    deleteTaskList();                
-                }
-                else if(input == "delete task")
-                {
-                    deleteTask();                
-                }
-                else
-                {
-                    Console.WriteLine("This option does not exist or is a work in progress.");
-                    UserInput("");
-                }
-            }
-            
+                Console.WriteLine("This option does not exist or is a work in progress.");
+                UserInput("");
+            }            
         }
 
         static void newTask()
         {
-            Task userTask = new Task();
+            Task newTask = new Task();
             Console.WriteLine("\nLet's CREATE a NEW TASK.");  
 
             // Task Description
             Console.WriteLine("Task Description:");
-            userTask.Description = Console.ReadLine();  
+            newTask.Description = Console.ReadLine();  
 
             // Task Start Date
             Console.WriteLine("\nTask Start Date (MM/DD/YEAR):");
@@ -106,7 +100,7 @@ namespace todo_list
             // Task Start Time
             Console.WriteLine("\nTask Start Time (HR:MN):");
             string taskStartTime = Console.ReadLine(); 
-            userTask.setStartDate(taskStartDate, taskStartTime);
+            newTask.setStartDate(taskStartDate, taskStartTime);
 
             // Task Due Date
             Console.WriteLine("\nTask Due Date (MM/DD/YEAR):");
@@ -115,11 +109,11 @@ namespace todo_list
             // Task Due Time
             Console.WriteLine("\nTask Due Time (HR:MN):");
             string taskDueTime = Console.ReadLine(); 
-            userTask.setStartDate(taskDueDate, taskDueTime);
+            newTask.setStartDate(taskDueDate, taskDueTime);
 
-            // saveTask(userTask);
-            Console.WriteLine("\nThat's all. Your task is now saved.");   
-            printTask(userTask);
+            saveData(newTask);
+            Console.WriteLine("\nThat's all. Your task is now saved.");  
+            printTask(newTask);
         }
 
         static void newTaskList()
@@ -137,13 +131,41 @@ namespace todo_list
             Console.WriteLine("\nWhich LIST would you like to DELETE?");   
         }
 
-        static void saveTask(Task task)
+        static void saveData(Task task)
         {
+            string tasksFilePath = Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ToDo_List", "tasks.xml");
+
+            System.Xml.Serialization.XmlSerializer xmlSerializer = new System.Xml.Serialization.XmlSerializer(task.GetType());
+            using (FileStream file = File.Create(tasksFilePath))
+            {
+                xmlSerializer.Serialize(file, task);
+            }
+            
+            // Process.Start(tasksFilePath);
+            Console.WriteLine("\nTasks Saved ------------");
+            printTask(task);
+        }
+
+        static Task loadData()
+        {
+            string tasksFilePath = Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ToDo_List", "tasks.xml");
+            object obj = new Object();
+            Task newTask = new Task();
+
+            System.Xml.Serialization.XmlSerializer xmlDeserializer = new System.Xml.Serialization.XmlSerializer(typeof(Task));
+            using (FileStream file = new FileStream(tasksFilePath, FileMode.Open))
+            {  
+                obj = xmlDeserializer.Deserialize(file);
+                newTask = (Task)obj;
+            }
+
+            Console.WriteLine("\nTasks Loaded -------");
+            return newTask;
         }
 
         static void printTask(Task task)
         {
-            Console.WriteLine("\nTask Description: {0} \nStart Date: {1} \nDue Date: {2}", 
+            Console.WriteLine("Task Description: {0} \nStart Date: {1} \nDue Date: {2}\n", 
                                 task.Description, task.startDate, task.dueDate.ToString()); 
         }
     }
